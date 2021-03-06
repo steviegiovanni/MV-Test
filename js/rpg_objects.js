@@ -6422,6 +6422,7 @@ Game_CharacterBase.prototype.isMapPassable = function(x, y, d) {
     var x2 = $gameMap.roundXWithDirection(x, d);
     var y2 = $gameMap.roundYWithDirection(y, d);
     var d2 = this.reverseDir(d);
+    console.log("x:"+x+"_x2:"+x2+",y:"+y+"_y2:"+y2);
     return $gameMap.isPassable(x, y, d) && $gameMap.isPassable(x2, y2, d2);
 };
 
