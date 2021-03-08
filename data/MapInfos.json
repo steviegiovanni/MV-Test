@@ -1,5 +1,7 @@
 [
 null,
-{"id":1,"expanded":false,"name":"MAP001","order":1,"parentId":0,"scrollX":832,"scrollY":640},
-{"id":2,"expanded":false,"name":"MAP002","order":2,"parentId":0,"scrollX":832,"scrollY":640}
+{"id":1,"expanded":false,"name":"MAP001","order":1,"parentId":0,"scrollX":819,"scrollY":461},
+null,
+{"id":3,"expanded":false,"name":"TemplateMap001","order":3,"parentId":4,"scrollX":819,"scrollY":461},
+{"id":4,"expanded":true,"name":"Template Maps","order":2,"parentId":0,"scrollX":819,"scrollY":461}
 ]
