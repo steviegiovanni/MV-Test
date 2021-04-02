@@ -58,3 +58,10 @@ Butter.Map.SpawnMonster = function(interpreter, mapIdOfSpawned, eventIdOfSpawned
 		}
 	}
 }
+
+Butter.Map.SetMonsterEventSpawner = function(event, mapIdOfSpawned, eventIdOfSpawned, spawnDelay) {
+	event.monsterSpawnerData = event.monsterSpawnerData || {};
+	event.monsterSpawnerData.mapIdOfSpawned = mapIdOfSpawned;
+	event.monsterSpawnerData.eventIdOfSpawned = eventIdOfSpawned;
+	event.monsterSpawnerData.spawnDelay = spawnDelay;
+}
