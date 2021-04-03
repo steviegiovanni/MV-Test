@@ -22,6 +22,7 @@ Butter.MonsterSpawner = Butter.MonsterSpawner || {};
  * @default 1
  */
 
+// called in pre-copy of the event copier that copies the spawner
 Game_Event.prototype.SetUpMonsterSpawnerEvent = function() {
 	var ev = this.event();
 	if (ev.note.match(/<(?:MONSTER SPAWNER):[ ](\d+),[ ](\d+)>/i)) {
@@ -33,7 +34,7 @@ Game_Event.prototype.SetUpMonsterSpawnerEvent = function() {
 	}
 }
 
-Butter.MonsterSpawner.SpawnMonster = function(event, mapIdOfSpawned, eventIdOfSpawned) {
+Butter.MonsterSpawner.SpawnMonster = function(event) {
 	if(!event.monsterSpawnerEvent) {
 		return;
 	}
@@ -54,7 +55,7 @@ Butter.MonsterSpawner.SpawnMonster = function(event, mapIdOfSpawned, eventIdOfSp
 		// spawnedEventId == 0 means the spawner hasn't spawned anything, so we can spawn
 		var spawnX = event.x + +spawnOffsetX;
 		var spawnY = event.y + +spawnOffsetY;
-		Yanfly.SpawnEventAt(mapIdOfSpawned, eventIdOfSpawned, spawnX, spawnY, false);
+		Yanfly.SpawnEventAt(event.monsterSpawnerMapId, event.monsterSpawnerEventId, spawnX, spawnY, false);
 		event.monsterSpawnerSpawnedEventId = $gameMap.LastSpawnedEventID();
 	} else {
 		// the spawner had spawned an event in the past, check whether the spawned event is still active
