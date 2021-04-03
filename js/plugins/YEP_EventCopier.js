@@ -334,7 +334,7 @@ Game_Event.prototype.setupCopyEvent = function() {
   } else if (ev.note.match(/<(?:COPY EVENT):[ ](\d+),[ ](\d+)>/i)) {
     var mapId = parseInt(RegExp.$1);
     var eventId = parseInt(RegExp.$2);
-  } else if (ev.note.match(/<(?:COPY EVENT):[ ](.*)>/i)) {
+  } else if (ev.note.match(/<(?:COPY EVENT):[ ]([^><]*)>/i)) {
     var name = String(RegExp.$1).toUpperCase();
     if (Yanfly.EventCopier.Template[name]) {
       var template = Yanfly.EventCopier.Template[name];
