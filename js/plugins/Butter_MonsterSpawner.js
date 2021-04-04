@@ -22,14 +22,18 @@ Butter.MonsterSpawner = Butter.MonsterSpawner || {};
  * @default 1
  */
 
+Butter.MonsterSpawner.Monsters = [
+	{ MapId: 3, EventId: 2, RespawnTimer: 3000 },
+	{ MapId: 3, EventId: 3, RespawnTimer: 3000 }
+]
+
 // called in pre-copy of the event copier that copies the spawner
 Game_Event.prototype.SetUpMonsterSpawnerEvent = function() {
 	var ev = this.event();
-	if (ev.note.match(/<(?:MONSTER SPAWNER):[ ](\d+),[ ](\d+)>/i)) {
+	if (ev.note.match(/<(?:MONSTER SPAWNER):[ ](\d+)>/i)) {
 		this.monsterSpawnerEvent = true;
-		this.monsterSpawnerMapId = parseInt(RegExp.$1);
-		this.monsterSpawnerEventId = parseInt(RegExp.$2);
-		this.monsterSpawnerTillSpawned = 0.0;
+		this.monsterSpawnerId = parseInt(RegExp.$1);
+		this.monsterSpawnerSpawnTime = 0;
 		this.monsterSpawnerSpawnedEventId = 0;
 	}
 }
@@ -50,19 +54,31 @@ Butter.MonsterSpawner.SpawnMonster = function(event) {
 		return;
 	}
 
+	// get spawn info
+	var spawnInfo = Butter.MonsterSpawner.Monsters[event.monsterSpawnerId];
+	if(!spawnInfo) {
+		return;
+	}
+
 	var spawnedEventId = event.monsterSpawnerSpawnedEventId;
 	if(spawnedEventId == 0) {
 		// spawnedEventId == 0 means the spawner hasn't spawned anything, so we can spawn
-		var spawnX = event.x + +spawnOffsetX;
-		var spawnY = event.y + +spawnOffsetY;
-		Yanfly.SpawnEventAt(event.monsterSpawnerMapId, event.monsterSpawnerEventId, spawnX, spawnY, false);
-		event.monsterSpawnerSpawnedEventId = $gameMap.LastSpawnedEventID();
+		var date = new Date();
+		if(event.monsterSpawnerSpawnTime == 0 || date.getTime() - spawnInfo.RespawnTimer >= event.monsterSpawnerSpawnTime) {
+			// only spawn if the respawn timer is fulfilled
+			var spawnX = event.x + +spawnOffsetX;
+			var spawnY = event.y + +spawnOffsetY;
+			Yanfly.SpawnEventAt(spawnInfo.MapId, spawnInfo.EventId, spawnX, spawnY, false);
+			event.monsterSpawnerSpawnedEventId = $gameMap.LastSpawnedEventID();
+		}
 	} else {
 		// the spawner had spawned an event in the past, check whether the spawned event is still active
 		var spawnedEvent = $gameMap.event(spawnedEventId);
 		if(spawnedEvent._pageIndex == -1) {
 			// spawned event is gone, set the spawned event id back to 0
 			event.monsterSpawnerSpawnedEventId = 0;
+			var date = new Date();
+			event.monsterSpawnerSpawnTime = date.getTime() + spawnInfo.RespawnTimer;
 		}
 	}
 }
