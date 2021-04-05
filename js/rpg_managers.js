@@ -2677,13 +2677,18 @@ BattleManager.processDefeat = function() {
 };
 
 BattleManager.endBattle = function(result) {
+    console.log("reached");
     this._phase = 'battleEnd';
     if (this._eventCallback) {
+        console.log("reached 2");
         this._eventCallback(result);
     }
+    console.log("reached 3");
     if (result === 0) {
+        console.log("win");
         $gameSystem.onBattleWin();
     } else if (this._escaped) {
+        console.log("escape");
         $gameSystem.onBattleEscape();
     }
 };
