@@ -2,6 +2,6 @@
 null,
 {"id":1,"expanded":false,"name":"MAP001","order":1,"parentId":0,"scrollX":451,"scrollY":336.5},
 null,
-{"id":3,"expanded":false,"name":"TemplateMap001","order":3,"parentId":4,"scrollX":451,"scrollY":287.5},
+{"id":3,"expanded":false,"name":"TemplateMap001","order":3,"parentId":4,"scrollX":818,"scrollY":456.5},
 {"id":4,"expanded":true,"name":"Template Maps","order":2,"parentId":0,"scrollX":819,"scrollY":461}
 ]
