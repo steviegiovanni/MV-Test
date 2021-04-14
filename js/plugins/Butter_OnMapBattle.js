@@ -1,11 +1,110 @@
 var Butter = Butter || {};
 Butter.OnMapBattle = Butter.OnMapBattle || {};
 
+// disable decrementing encounter count
+Game_Player.prototype.updateEncounterCount = function() {};
+
+// call this to initiate battle on touch
+Butter.OnMapBattle.InitiateBattle = function(event) {
+	var ev = event.event();
+	if (ev.note.match(/<(?:MONSTER ID):[ ](\d+)>/i)) {
+		var troopId = parseInt(RegExp.$1);
+		if ($dataTroops[troopId]) {
+			Yanfly.DespawnEventID(event.eventId());   
+            BattleManager.setup(troopId, true, false);
+            BattleManager.onEncounter();
+         	$gamePlayer._encounterCount = 0;
+        }
+	}
+}
+
+// we no longer check for troop id here
+// we setup battle info before setting _encounterCount to 0 and calling this function
+Game_Player.prototype.executeEncounter = function() {
+	if (!$gameMap.isEventRunning() && this._encounterCount <= 0) {
+		this.makeEncounterCount();
+		return true;
+    } else {
+    	return false;
+    }
+}
+
+// we no longer push a new Scene_Battle to the stack
+// instead we call all the creations of the battle window for Scene_Map
+Scene_Map.prototype.updateEncounter = function() {
+	if ($gamePlayer.executeEncounter()) {
+		this.CreateAllBattleWindow();
+		//SceneManager.push(Scene_Battle);
+	}       
+};
+
+// create all battle related windows that were used to be created in Scene_Battle's start
+Scene_Map.prototype.CreateAllBattleWindow = function() {
+	//this.createBattleSpriteset();
+	this.createLogWindow();
+    this.createStatusWindow();
+    this.createPartyCommandWindow();
+    this.createActorCommandWindow();
+    this.createHelpWindow();
+    this.createSkillWindow();
+    this.createItemWindow();
+    this.createActorWindow();
+    this.createEnemyWindow();
+    this.createMessageWindow();
+    this.createScrollTextWindow();
+    BattleManager.setLogWindow(this._logWindow);
+    BattleManager.setStatusWindow(this._statusWindow);
+    // don't know what to do with these yet
+    //BattleManager.setSpriteset(this._spriteset);
+    //this._logWindow.setSpriteset(this._spriteset);
+	BattleManager.startBattle();
+}
+
+// don't pop the scene when battle end because we're doing battle in the map
+// also call $gameParty and $gameTroop onBattleEnd because we're no longer calling
+// them when battle scene terminates
+BattleManager.updateBattleEnd = function() {
+    if (this.isBattleTest()) {
+        AudioManager.stopBgm();
+        SceneManager.exit();
+    } else if (!this._escaped && $gameParty.isAllDead()) {
+        if (this._canLose) {
+            $gameParty.reviveBattleMembers();
+        } else {
+            SceneManager.goto(Scene_Gameover);
+        }
+    } else {
+    	$gameParty.onBattleEnd();
+	    $gameTroop.onBattleEnd();
+	    ImageManager.clearRequest();
+    }
+    this._phase = null;
+};
+
+// haven't figured out what to do with the sprite
 BattleManager.isBusy = function() {
     return ($gameMessage.isBusy() || /*this._spriteset.isBusy() ||*/
             this._logWindow.isBusy());
 };
 
+// haven't figured out what to do with the sprite
+Window_BattleLog.prototype.updateWaitMode = function() {
+    var waiting = false;
+    /*switch (this._waitMode) {
+    case 'effect':
+        waiting = this._spriteset.isEffecting();
+        break;
+    case 'movement':
+        waiting = this._spriteset.isAnyoneMoving();
+        break;
+    }*/
+    if (!waiting) {
+        this._waitMode = '';
+    }
+    return waiting;
+};
+
+// adding updating battle related stuff in the scene map update cycle
 Scene_Map.prototype.updateMain = function() {
     var active = this.isActive();
     $gameMap.update(active);
@@ -21,14 +120,16 @@ Scene_Map.prototype.updateMain = function() {
     }
 };
 
+// ====================================================================
+// moved logic from Scene_Battle to Scene_Map
+// ====================================================================
+
+// we don't want to open the _statusWindow anymore by default
 Scene_Map.prototype.updateStatusWindow = function() {
     if ($gameMessage.isBusy()) {
         this._statusWindow.close();
         this._partyCommandWindow.close();
         this._actorCommandWindow.close();
-    } else if (this.isActive() && !this._messageWindow.isClosing()) {
-    	console.log(this);
-        this._statusWindow.open();
     }
 };
 
@@ -69,52 +170,6 @@ Scene_Map.prototype.isAnyInputWindowActive = function() {
             this._actorWindow.active ||
             this._enemyWindow.active);
 };
-
-/*Scene_Battle.prototype.update = function() {
-    var active = this.isActive();
-    this.updateStatusWindow();
-    this.updateWindowPositions();
-    if (active && !this.isBusy()) {
-        this.updateBattleProcess();
-    }
-};*/
-
-Game_Player.prototype.executeEncounter = function() {
-	if (!$gameMap.isEventRunning() && this._encounterCount <= 0) {
-		this.makeEncounterCount();
-		return true;
-    } else {
-    	return false;
-    }
-}
-
-Scene_Map.prototype.updateEncounter = function() {
-	if ($gamePlayer.executeEncounter()) {
-		this.CreateAllBattleWindow();
-		//SceneManager.push(Scene_Battle);
-	}       
-};
-
-Scene_Map.prototype.CreateAllBattleWindow = function() {
-	//this.createBattleSpriteset();
-	this.createLogWindow();
-    this.createStatusWindow();
-    this.createPartyCommandWindow();
-    this.createActorCommandWindow();
-    this.createHelpWindow();
-    this.createSkillWindow();
-    this.createItemWindow();
-    this.createActorWindow();
-    this.createEnemyWindow();
-    this.createMessageWindow();
-    this.createScrollTextWindow();
-    console.log(this);
-    BattleManager.setLogWindow(this._logWindow);
-    BattleManager.setStatusWindow(this._statusWindow);
-    //BattleManager.setSpriteset(this._spriteset);
-    //this._logWindow.setSpriteset(this._spriteset);
-	BattleManager.startBattle();
-}
 
 Scene_Map.prototype.createBattleSpriteset = function() {
     this._battleSpriteset = new Spriteset_Battle();
@@ -373,17 +428,3 @@ Scene_Map.prototype.createScrollTextWindow = function() {
     this._scrollTextWindow = new Window_ScrollText();
     this.addWindow(this._scrollTextWindow);
 };
-
-Butter.OnMapBattle.InitiateBattle = function(event) {
-	var ev = event.event();
-	if (ev.note.match(/<(?:MONSTER ID):[ ](\d+)>/i)) {
-		var troopId = parseInt(RegExp.$1);
-		if ($dataTroops[troopId]) {
-            BattleManager.setup(troopId, true, false);
-            BattleManager.onEncounter();
-         	$gamePlayer._encounterCount = 0;
-			Yanfly.DespawnEventID(event.eventId());   
-        }
-	}
-}
-

@@ -39,7 +39,7 @@ Game_Event.prototype.SetUpMonsterSpawnerEvent = function() {
 }
 
 Butter.MonsterSpawner.SpawnMonster = function(event) {
-	if(!event.monsterSpawnerEvent) {
+	if(!event.monsterSpawnerEvent || $gameParty.inBattle()) {
 		return;
 	}
 
@@ -65,6 +65,7 @@ Butter.MonsterSpawner.SpawnMonster = function(event) {
 		// spawnedEventId == 0 means the spawner hasn't spawned anything, so we can spawn
 		var date = new Date();
 		if(event.monsterSpawnerSpawnTime == 0 || date.getTime() - spawnInfo.RespawnTimer >= event.monsterSpawnerSpawnTime) {
+			console.log(event);
 			// only spawn if the respawn timer is fulfilled
 			var spawnX = event.x + +spawnOffsetX;
 			var spawnY = event.y + +spawnOffsetY;
