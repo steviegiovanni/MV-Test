@@ -1,6 +1,12 @@
 var Butter = Butter || {};
 Butter.OnMapBattle = Butter.OnMapBattle || {};
 
+// disable player movement when in battle
+Butter.OnMapBattle.canPlayerMove = Game_Player.prototype.canMove;
+Game_Player.prototype.canMove = function() {
+    return !$gameParty.inBattle() && Butter.OnMapBattle.canPlayerMove.call(this);
+};
+
 // disable decrementing encounter count
 Game_Player.prototype.updateEncounterCount = function() {};
 

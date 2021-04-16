@@ -63,14 +63,16 @@ Butter.MonsterSpawner.SpawnMonster = function(event) {
 	var spawnedEventId = event.monsterSpawnerSpawnedEventId;
 	if(spawnedEventId == 0) {
 		// spawnedEventId == 0 means the spawner hasn't spawned anything, so we can spawn
-		var date = new Date();
-		if(event.monsterSpawnerSpawnTime == 0 || date.getTime() - spawnInfo.RespawnTimer >= event.monsterSpawnerSpawnTime) {
-			console.log(event);
+		if(event.monsterSpawnerSpawnTime <= 0) {
 			// only spawn if the respawn timer is fulfilled
 			var spawnX = event.x + +spawnOffsetX;
 			var spawnY = event.y + +spawnOffsetY;
 			Yanfly.SpawnEventAt(spawnInfo.MapId, spawnInfo.EventId, spawnX, spawnY, false);
 			event.monsterSpawnerSpawnedEventId = $gameMap.LastSpawnedEventID();
+		}
+		else
+		{
+			event.monsterSpawnerSpawnTime -= 1000 * 1 / Graphics._fpsMeter.fps;
 		}
 	} else {
 		// the spawner had spawned an event in the past, check whether the spawned event is still active
@@ -78,8 +80,7 @@ Butter.MonsterSpawner.SpawnMonster = function(event) {
 		if(spawnedEvent._pageIndex == -1) {
 			// spawned event is gone, set the spawned event id back to 0
 			event.monsterSpawnerSpawnedEventId = 0;
-			var date = new Date();
-			event.monsterSpawnerSpawnTime = date.getTime() + spawnInfo.RespawnTimer;
+			event.monsterSpawnerSpawnTime = spawnInfo.RespawnTimer;
 		}
 	}
 }
