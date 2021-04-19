@@ -208,5 +208,6 @@ var $plugins =
 {"name":"Tweak_SmartJump","status":false,"description":"Tweak for YEP_SmartJump to work on pixel based movement","parameters":{}},
 {"name":"Tweak_Input","status":true,"description":"","parameters":{}},
 {"name":"Butter_MonsterSpawner","status":true,"description":"","parameters":{"---General---":"","SpawnOffsetX":"0","SpawnOffsetY":"1"}},
-{"name":"Butter_OnMapBattle","status":true,"description":"","parameters":{}}
+{"name":"Butter_OnMapBattle","status":true,"description":"","parameters":{}},
+{"name":"Butter_Pathfinding","status":true,"description":"","parameters":{}}
 ];
