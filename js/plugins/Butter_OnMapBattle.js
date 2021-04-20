@@ -39,7 +39,7 @@ Game_Player.prototype.executeEncounter = function() {
 // instead we call all the creations of the battle window for Scene_Map
 Scene_Map.prototype.updateEncounter = function() {
 	if ($gamePlayer.executeEncounter()) {
-        var pathfinder = new Butter.Pathfinding({x: 0, y: 0}, {x: 2, y: 2});
+        var pathfinder = new Butter.Pathfinding({x: 0, y: 0}, {x: 20, y: 20});
 		this.CreateAllBattleWindow();
 		//SceneManager.push(Scene_Battle);
 	}       
