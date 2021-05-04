@@ -39,7 +39,6 @@ Game_Player.prototype.executeEncounter = function() {
 // instead we call all the creations of the battle window for Scene_Map
 Scene_Map.prototype.updateEncounter = function() {
 	if ($gamePlayer.executeEncounter()) {
-        var pathfinder = new Butter.Pathfinding({x: 0, y: 0}, {x: 20, y: 20});
 		this.CreateAllBattleWindow();
 		//SceneManager.push(Scene_Battle);
 	}       
@@ -435,3 +434,26 @@ Scene_Map.prototype.createScrollTextWindow = function() {
     this._scrollTextWindow = new Window_ScrollText();
     this.addWindow(this._scrollTextWindow);
 };
+
+// BattleSpace
+Butter.OnMapBattle.IsBattleSpace = function(event) {
+    var ev = event.event();
+    return ev.note.match(/<(?:BATTLE SPACE):[ ]([^><]*)>/i);
+}
+
+Butter.OnMapBattle.FindClosestBattleSpaceTo = function(pos) {
+    var path = [];
+    var pathfinderStart = {x: Math.max(pos.x - 10, 0), y: Math.max(pos.y - 10, 0)};
+    var pathfinderEnd = {x: Math.min(pos.x + 10, $gameMap.width() - 1), y: Math.min(pos.y + 10, $gameMap.height() - 1)};
+    var pathfinder = new Butter.Pathfinding(pathfinderStart, pathfinderEnd);
+    $gameMap.events().forEach(function(event) {
+        if(Butter.OnMapBattle.IsBattleSpace(event)) {
+            var eventPos = {x: event.x, y: event.y};
+            var pathToEvent = pathfinder.FindPath(pos, eventPos);
+            if((pathToEvent.length <= path.length) || (path.length == 0)) {
+                path = pathToEvent;
+            }
+        }
+    });
+    return path;
+}

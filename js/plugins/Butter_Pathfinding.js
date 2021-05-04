@@ -11,8 +11,8 @@ Butter.Pathfinding = function(start, end) {
 			this.grid[i][j] = {};
 		}
 	}
-	var test = this.FindPath({x: 15, y: 9}, {x: 0, y: 0});
-	console.log(test);
+	//var test = this.FindPath({x: 15, y: 9}, {x: 0, y: 0});
+	//console.log(test);
 }
 
 Butter.Pathfinding.prototype.Heuristic = function(pos0, pos1) {
